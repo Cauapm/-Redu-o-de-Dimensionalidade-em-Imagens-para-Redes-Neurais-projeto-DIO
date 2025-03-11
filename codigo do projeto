@@ -1,0 +1,60 @@
+from google.colab import drive
+from PIL import Image
+
+# Montando o Google Drive
+drive.mount('/content/drive')
+
+# Caminho da imagem
+imagem_path = "/content/drive/My Drive/leao.jpg"
+imagem = Image.open(imagem_path)
+
+# Função para converter imagem para escala de cinza
+def imagem_para_cinza(imagem):
+    largura, altura = imagem.size
+    imagem_cinza = Image.new("L", (largura, altura))  # Escala de cinza
+    for y in range(altura):
+        for x in range(largura):
+            r, g, b = imagem.getpixel((x, y))
+            cinza = int(0.299 * r + 0.587 * g + 0.114 * b)
+            imagem_cinza.putpixel((x, y), cinza)
+    return imagem_cinza
+
+# Função para binarizar a imagem
+def imagem_para_binaria(imagem_cinza, limiar=127):
+    largura, altura = imagem_cinza.size
+    imagem_binaria = Image.new("1", (largura, altura))  # Imagem binária
+    for y in range(altura):
+        for x in range(largura):
+            valor_cinza = imagem_cinza.getpixel((x, y))
+            valor_binario = 1 if valor_cinza > limiar else 0
+            imagem_binaria.putpixel((x, y), valor_binario)
+    return imagem_binaria
+
+# Convertendo para cinza
+imagem_cinza = imagem_para_cinza(imagem)
+
+# Binarizando a imagem
+imagem_binaria = imagem_para_binaria(imagem_cinza)
+
+# Exibindo as imagens usando matplotlib para garantir que elas apareçam no Google Colab
+import matplotlib.pyplot as plt
+
+# Exibindo as imagens com Matplotlib
+fig, ax = plt.subplots(1, 3, figsize=(15, 5))
+
+# Exibindo a imagem original
+ax[0].imshow(imagem)
+ax[0].set_title("Imagem Original")
+ax[0].axis("off")
+
+# Exibindo a imagem em tons de cinza
+ax[1].imshow(imagem_cinza, cmap='gray')
+ax[1].set_title("Imagem em Cinza")
+ax[1].axis("off")
+
+# Exibindo a imagem binarizada
+ax[2].imshow(imagem_binaria, cmap='gray')
+ax[2].set_title("Imagem Binarizada")
+ax[2].axis("off")
+
+plt.show()
